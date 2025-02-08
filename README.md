@@ -1,5 +1,7 @@
 # Practica avanzada de SQL
 
+Descricpcion de la actividad [Practica SQL y DW](https://drive.google.com/file/d/1M6gLWsdVLbMGbEDw1aZ7Qm4MtcoS-GyA/view?usp=sharing)
+
 # 📌 Diagrama Entidad-Relación (E/R)
 
 ## 1️⃣ Introducción
@@ -176,6 +178,22 @@ Table IVR_Step {
 }
 
 ```
+## 📌 Índice de Actividades 🔗
 
+| #  | Actividad | Enlace |
+|----|----------|--------|
+| 1️⃣ | **Diagrama Entidad-Relación** | [Ir a actividad](#1-diagrama-entidad-relacion) |
+| 2️⃣ | **Creación de Base de Datos** | [Ir a actividad](#2-creacion-de-base-de-datos) |
+| 3️⃣ | **Crear Tabla `ivr_detail`** | [Ir a actividad](#3-crear-tabla-ivr_detail) |
+| 4️⃣ | **Generar campo `vdn_aggregation`** | [Ir a actividad](#4-generar-el-campo-vdn_aggregation) |
+| 5️⃣ | **Generar `document_type` y `document_identification`** | [Ir a actividad](#5-generar-los-campos-document_type-y-document_identification) |
+| 6️⃣ | **Generar el campo `customer_phone`** | [Ir a actividad](#6-generar-el-campo-customer_phone) |
+| 7️⃣ | **Generar el campo `billing_account_id`** | [Ir a actividad](#7-generar-el-campo-billing_account_id) |
+| 8️⃣ | **Generar el campo `masiva_lg`** | [Ir a actividad](#8-generar-el-campo-masiva_lg) |
+| 9️⃣ | **Generar el campo `info_by_phone_lg`** | [Ir a actividad](#9-generar-el-campo-info_by_phone_lg) |
+| 🔟 | **Generar el campo `info_by_dni_lg`** | [Ir a actividad](#10-generar-el-campo-info_by_dni_lg) |
+| 1️⃣1️⃣ | **Generar `repeated_phone_24H` y `cause_recall_phone_24H`** | [Ir a actividad](#11-generar-los-campos-repeated_phone_24h-y-cause_recall_phone_24h) |
+| 1️⃣2️⃣ | **Crear Tabla `ivr_summary`** | [Ir a actividad](#12-crear-tabla-ivr_summary) |
+| 1️⃣3️⃣ | **Crear función `clean_integer`** | [Ir a actividad](#13-crear-funcion-clean_integer) |
 
-
+---
