@@ -1,0 +1,22 @@
+ALTER TABLE ivr_detail ADD COLUMN info_by_phone_lg INTEGER DEFAULT 0; -- Aca voy a necesitar modificar la tabla ivr_detail para agregar info_by_phone_lg
+WITH IdentificacionTelefono AS (
+    -- CTE que marca con 1 si el cliente fue identificado por teléfono
+    SELECT 
+        d.calls_ivr_id,
+        CASE 
+            WHEN COUNT(s.ivr_step_id) FILTER (
+                WHERE s.step_name = 'CUSTOMERINFOBYPHONE.TX' -- Filtro por el nombre del paso
+                AND s.step_result = 'OK' -- Filtro por el resultado del paso 
+            ) > 0 THEN 1
+            ELSE 0
+        END AS info_by_phone_lg
+    FROM ivr_detail d
+    LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id
+    GROUP BY d.calls_ivr_id
+)
+
+-- Actualizar la tabla ivr_detail con el flag `info_by_phone_lg`
+UPDATE ivr_detail AS d
+SET info_by_phone_lg = it.info_by_phone_lg
+FROM IdentificacionTelefono it
+WHERE d.calls_ivr_id = it.calls_ivr_id;

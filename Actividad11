@@ -1,0 +1,34 @@
+WITH 
+LlamadasPrevias AS (
+    -- CTE para detectar llamadas previas en las 24h anteriores
+    SELECT d1.calls_ivr_id, 1 AS repeated_phone_24H
+    FROM ivr_detail d1
+    WHERE EXISTS (
+        SELECT 1 
+        FROM ivr_detail d2
+        WHERE d2.calls_phone_number = d1.calls_phone_number
+        AND d2.calls_start_date BETWEEN d1.calls_start_date - INTERVAL '1 day' 
+                                    AND d1.calls_start_date - INTERVAL '1 second'
+    )
+),
+LlamadasPosteriores AS (
+    -- CTE para detectar llamadas en las 24h posteriores
+    SELECT d1.calls_ivr_id, 1 AS cause_recall_phone_24H
+    FROM ivr_detail d1
+    WHERE EXISTS (
+        SELECT 1 
+        FROM ivr_detail d3
+        WHERE d3.calls_phone_number = d1.calls_phone_number
+        AND d3.calls_start_date BETWEEN d1.calls_start_date + INTERVAL '1 second' 
+                                    AND d1.calls_start_date + INTERVAL '1 day'
+    )
+)
+
+-- Actualizar la tabla `ivr_detail` con los valores de los flags
+UPDATE ivr_detail AS d
+SET 
+    repeated_phone_24H = COALESCE(lp.repeated_phone_24H, 0),
+    cause_recall_phone_24H = COALESCE(lpo.cause_recall_phone_24H, 0)
+FROM LlamadasPrevias lp
+FULL OUTER JOIN LlamadasPosteriores lpo ON lp.calls_ivr_id = lpo.calls_ivr_id
+WHERE d.calls_ivr_id = COALESCE(lp.calls_ivr_id, lpo.calls_ivr_id);

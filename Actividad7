@@ -1,0 +1,19 @@
+-- Aca voy a necesitar modificar la tabla ivr_detail para agregar billing_account_id
+ALTER TABLE ivr_detail ADD COLUMN billing_account_id VARCHAR(50);
+-- Aca voy a necesitar modificar la tabla ivr_detail para agregar customer_id
+WITH DatosBilling AS (
+    -- CTE que obtiene el número de cuenta del cliente desde Pago o IVR_Step
+    SELECT 
+        d.calls_ivr_id,
+        COALESCE(p.billing_account_id, s.step_billing_account) AS billing_account_id
+    FROM ivr_detail d
+    LEFT JOIN Inscripcion i ON d.calls_ivr_id = i.inscripcion_id
+    LEFT JOIN Pago p ON i.inscripcion_id = p.inscripcion_id
+    LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id
+)
+
+-- Actualizar la tabla ivr_detail con el número de cuenta identificado
+UPDATE ivr_detail AS d
+SET billing_account_id = db.billing_account_id
+FROM DatosBilling db
+WHERE d.calls_ivr_id = db.calls_ivr_id;

@@ -1,0 +1,22 @@
+ALTER TABLE ivr_detail ADD COLUMN masiva_lg INTEGER DEFAULT 0; -- Aca voy a necesitar modificar la tabla ivr_detail para agregar masiva_lg
+WITH IdentificacionMasiva AS (
+    -- CTE que verifica si la llamada pasó por el módulo AVERIA_MASIVA
+    SELECT 
+        d.calls_ivr_id,
+        CASE 
+            WHEN EXISTS ( -- Verificamos si existe al menos un módulo AVERIA_MASIVA
+                SELECT 1 
+                FROM IVR_Module m 
+                WHERE m.ivr_call_id = d.calls_ivr_id  -- Relacionamos el módulo con la llamada
+                AND m.module_name = 'AVERIA_MASIVA' -- Filtro por el nombre del módulo
+            ) THEN 1
+            ELSE 0
+        END AS masiva_lg
+    FROM ivr_detail d
+)
+
+-- Actualizar la tabla ivr_detail con el flag `masiva_lg`
+UPDATE ivr_detail AS d
+SET masiva_lg = im.masiva_lg
+FROM IdentificacionMasiva im
+WHERE d.calls_ivr_id = im.calls_ivr_id;

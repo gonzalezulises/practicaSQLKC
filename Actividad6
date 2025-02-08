@@ -1,0 +1,16 @@
+-- considerando usar CTEs para mejorar la legibilidad y mantenibilidad del código.
+WITH DatosTelefono AS (
+    -- CTE que obtiene el número de teléfono del cliente desde Inscripcion o IVR_Step
+    SELECT 
+        d.calls_ivr_id,
+        COALESCE(i.telefono, s.step_phone) AS customer_phone
+    FROM ivr_detail d
+    LEFT JOIN Inscripcion i ON d.calls_ivr_id = i.inscripcion_id
+    LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id
+)
+
+-- Actualizar la tabla ivr_detail con el número de teléfono identificado
+UPDATE ivr_detail AS d
+SET customer_phone = dt.customer_phone
+FROM DatosTelefono dt
+WHERE d.calls_ivr_id = dt.calls_ivr_id;

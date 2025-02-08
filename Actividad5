@@ -1,4 +1,7 @@
-SELECT *, -- Seleccionamos todos los campos de la tabla, más los campos adicionales. El ejercicio no demanda que los datos sean persistentes o que deba guardarlos en una tabla, por eso lo dejo a nivel de consulta
-    COALESCE(document_type, step_document_type) AS document_type,
-    COALESCE(document_identification, step_document_identification) AS document_identification
-FROM ivr_detail;
+ALTER TABLE ivr_detail ADD COLUMN customer_phone VARCHAR(20); -- Aca voy a necesitar modificar la tabla ivr_detail para agregar customer_phone
+-- Aca voy a necesitar modificar la tabla ivr_detail para agregar customer_phone
+UPDATE ivr_detail AS d 
+SET customer_phone = COALESCE(i.telefono, s.step_phone) -- Obtenemos el número de teléfono del cliente desde Inscripcion o IVR_Step
+FROM Inscripcion i
+LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id -- Relacionamos la llamada con los pasos IVR
+WHERE d.calls_ivr_id = i.inscripcion_id; -- Relacionamos la llamada con la inscripción

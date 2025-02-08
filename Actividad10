@@ -1,0 +1,19 @@
+WITH IdentificacionDNI AS (
+    -- CTE que determina si la llamada pasó por el step `CUSTOMERINFOBYDNI.TX` con resultado 'OK'
+    SELECT 
+        d.calls_ivr_id,
+        MAX(CASE -- Uso MAX para obtener el valor 1 si existe al menos un registro con las condiciones dadas
+                WHEN s.step_name = 'CUSTOMERINFOBYDNI.TX' AND s.step_result = 'OK' 
+                THEN 1 
+                ELSE 0 
+            END) AS info_by_dni_lg
+    FROM ivr_detail d
+    LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id
+    GROUP BY d.calls_ivr_id
+)
+
+-- Actualizando la tabla `ivr_detail` con el flag `info_by_dni_lg`
+UPDATE ivr_detail AS d
+SET info_by_dni_lg = idni.info_by_dni_lg
+FROM IdentificacionDNI idni
+WHERE d.calls_ivr_id = idni.calls_ivr_id;

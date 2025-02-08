@@ -9,10 +9,10 @@ FROM ivr_detail;
 
 
 
--- si necesitara guardar el resultado
+-- guardo la actualizacion
 ALTER TABLE ivr_detail ADD COLUMN vdn_aggregation VARCHAR(20);
 
--- aca la actualizacion
+-- Actualizar la tabla ivr_detail con el número de cuenta identificado
 UPDATE ivr_detail
 SET vdn_aggregation = 
     CASE 
