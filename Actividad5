@@ -1,0 +1,4 @@
+SELECT *, -- Seleccionamos todos los campos de la tabla, más los campos adicionales. El ejercicio no demanda que los datos sean persistentes o que deba guardarlos en una tabla, por eso lo dejo a nivel de consulta
+    COALESCE(document_type, step_document_type) AS document_type,
+    COALESCE(document_identification, step_document_identification) AS document_identification
+FROM ivr_detail;
