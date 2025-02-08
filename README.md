@@ -52,59 +52,56 @@ A partir de los casos de uso, el sistema debe cumplir con los siguientes requisi
 
 ## 5️⃣ Entidades y Atributos 📊
 
-🏫 Alumno
 ```sql
-alumno_id INTEGER PRIMARY KEY, -- Identificador único
-nombre VARCHAR(50), 
-apellido VARCHAR(50),
-email VARCHAR(100), 
-telefono VARCHAR(20),
-direccion VARCHAR(100)
 
-📜 Inscripción
+Alumno
+• alumno_id (integer) → Clave primaria
+• nombre (varchar) → Nombre del alumno
+• apellido (varchar) → Apellido del alumno
+• email (varchar) → Correo electrónico
+• telefono (varchar) → Número de teléfono
+• direccion (varchar) → Dirección del alumno
 
-inscripcion_id INTEGER PRIMARY KEY, 
-alumno_id INTEGER REFERENCES Alumno(alumno_id),
-bootcamp_id INTEGER REFERENCES Bootcamp(bootcamp_id),
-fechaInscripcion DATE,
-estadoInscripcion VARCHAR(20)
+Inscripción
+• inscripcion_id (integer) → Clave primaria
+• alumno_id (integer) → Clave foránea, referencia a Alumno
+• bootcamp_id (integer) → Clave foránea, referencia a Bootcamp
+• fechaInscripcion (date) → Fecha en que el alumno se inscribió
+• estadoInscripcion (varchar) → Estado de la inscripción (activo, cancelado, etc.)
 
-💳 Pago
+Pago
+• pago_id (integer) → Clave primaria
+• inscripcion_id (integer) → Clave foránea, referencia a Inscripción
+• fechaPago (date) → Fecha en que se realizó el pago
+• montoPago (decimal) → Monto del pago realizado
 
-pago_id INTEGER PRIMARY KEY, 
-inscripcion_id INTEGER REFERENCES Inscripcion(inscripcion_id),
-fechaPago DATE,
-montoPago DECIMAL(10,2)
+Bootcamp
+• bootcamp_id (integer) → Clave primaria
+• nombre (varchar) → Nombre del bootcamp
+• descripcion (varchar) → Descripción general del bootcamp
+• fechaInicio (date) → Fecha de inicio del bootcamp
+• fechaFin (date) → Fecha de finalización del bootcamp
 
-🚀 Bootcamp
+Módulo
+• modulo_id (integer) → Clave primaria
+• nombre (varchar) → Nombre del módulo dentro del bootcamp
+• descripcion (varchar) → Descripción del módulo
+• fechaInicio (date) → Fecha de inicio del módulo
+• bootcamp_id (integer) → Clave foránea, referencia a Bootcamp
 
-bootcamp_id INTEGER PRIMARY KEY, 
-nombre VARCHAR(50),
-descripcion VARCHAR(200),
-fechaInicio DATE,
-fechaFin DATE
+Profesor
+• profesor_id (integer) → Clave primaria
+• nombre (varchar) → Nombre del profesor
+• apellido (varchar) → Apellido del profesor
+• email (varchar) → Correo electrónico
+• telefono (varchar) → Número de teléfono
+• direccion (varchar) → Dirección del profesor
+• modulo_id (integer) → Clave foránea, referencia a Módulo
 
-📚 Módulo
+## 🔗 Diagrama Entidad-Relación
 
-modulo_id INTEGER PRIMARY KEY, 
-nombre VARCHAR(50),
-descripcion VARCHAR(200),
-fechaInicio DATE,
-bootcamp_id INTEGER REFERENCES Bootcamp(bootcamp_id)
+Puedes ver el diagrama en **dbdiagram.io** en el siguiente enlace:
 
-👨‍🏫 Profesor
-
-profesor_id INTEGER PRIMARY KEY, 
-nombre VARCHAR(50),
-apellido VARCHAR(50),
-email VARCHAR(100),
-telefono VARCHAR(20),
-direccion VARCHAR(100),
-modulo_id INTEGER REFERENCES Modulo(modulo_id)
-
-🔗 Diagrama Entidad-Relación
-
-📌 Ver el diseño en línea:
 [📊 Ver el Diagrama E/R en dbdiagram.io](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
 
 
