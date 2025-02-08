@@ -183,7 +183,7 @@ Table IVR_Step {
 | #  | Actividad | Enlace |
 |----|----------|--------|
 | 1️⃣ | **Diagrama Entidad-Relación** | [Ir a actividad](#1-diagrama-entidad-relacion) |
-| 2️⃣ | **Creación de Base de Datos** | [Ir a actividad](#2-creacion-de-base-de-datos) |
+| 2️⃣ | **Creación de Base de Datos** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad2) |
 | 3️⃣ | **Crear Tabla `ivr_detail`** | [Ir a actividad](#3-crear-tabla-ivr_detail) |
 | 4️⃣ | **Generar campo `vdn_aggregation`** | [Ir a actividad](#4-generar-el-campo-vdn_aggregation) |
 | 5️⃣ | **Generar `document_type` y `document_identification`** | [Ir a actividad](#5-generar-los-campos-document_type-y-document_identification) |
