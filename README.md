@@ -54,6 +54,8 @@ A partir de los casos de uso, el sistema debe cumplir con los siguientes requisi
 
 ## 5️⃣ Entidades y Atributos 📊
 
+## 🔗 [Diagrama Entidad-Relación](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
+
 ```sql
 
 Alumno
@@ -100,7 +102,7 @@ Profesor
 • direccion (varchar) → Dirección del profesor
 • modulo_id (integer) → Clave foránea, referencia a Módulo
 
-## 🔗 [Diagrama Entidad-Relación](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
+
 
 
 
