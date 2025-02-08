@@ -1,3 +1,5 @@
+# Practica avanzada de SQL
+
 # 📌 Diagrama Entidad-Relación (E/R)
 
 ## 1️⃣ Introducción
@@ -98,10 +100,7 @@ Profesor
 • direccion (varchar) → Dirección del profesor
 • modulo_id (integer) → Clave foránea, referencia a Módulo
 
-## 🔗 Diagrama Entidad-Relación
+## 🔗 [Diagrama Entidad-Relación](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
 
-Puedes ver el diagrama en **dbdiagram.io** en el siguiente enlace:
-
-[📊 Ver el Diagrama E/R en dbdiagram.io](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
 
 
