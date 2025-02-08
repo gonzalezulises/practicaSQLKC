@@ -56,55 +56,126 @@ A partir de los casos de uso, el sistema debe cumplir con los siguientes requisi
 
 Link al 🔗 [Diagrama Entidad-Relación](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
 
-<a href="https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8" target="_blank">Ver Diagrama de Base de Datos</a>
-
 ```sql
 
-Alumno
-• alumno_id (integer) → Clave primaria
-• nombre (varchar) → Nombre del alumno
-• apellido (varchar) → Apellido del alumno
-• email (varchar) → Correo electrónico
-• telefono (varchar) → Número de teléfono
-• direccion (varchar) → Dirección del alumno
+// Utilizando DBML to define your database structure y generar la diagramacion, de manera que la pueda reutilizar
 
-Inscripción
-• inscripcion_id (integer) → Clave primaria
-• alumno_id (integer) → Clave foránea, referencia a Alumno
-• bootcamp_id (integer) → Clave foránea, referencia a Bootcamp
-• fechaInscripcion (date) → Fecha en que el alumno se inscribió
-• estadoInscripcion (varchar) → Estado de la inscripción (activo, cancelado, etc.)
+Table Alumno {
+  alumno_id integer [primary key]
+  nombre varchar
+  apellido varchar
+  email varchar
+  telefono varchar
+  direccion varchar
+  document_type varchar
+  document_identification varchar
+  canal_id integer [ref: > Canal_Inscripcion.canal_id]  
+}
 
-Pago
-• pago_id (integer) → Clave primaria
-• inscripcion_id (integer) → Clave foránea, referencia a Inscripción
-• fechaPago (date) → Fecha en que se realizó el pago
-• montoPago (decimal) → Monto del pago realizado
+Table Bootcamp {
+  bootcamp_id integer [primary key]
+  nombre varchar
+  descripcion varchar
+  fechaInicio date
+  fechaFin date
+  costo decimal(10,2)
+  profesor_id integer [ref: > Profesor.profesor_id]  
+}
 
-Bootcamp
-• bootcamp_id (integer) → Clave primaria
-• nombre (varchar) → Nombre del bootcamp
-• descripcion (varchar) → Descripción general del bootcamp
-• fechaInicio (date) → Fecha de inicio del bootcamp
-• fechaFin (date) → Fecha de finalización del bootcamp
+Table Modulo {
+  modulo_id integer [primary key]
+  nombre varchar
+  descripcion varchar
+  fechaInicio date
+  fechaFin date
+  bootcamp_id integer [ref: > Bootcamp.bootcamp_id]
+}
 
-Módulo
-• modulo_id (integer) → Clave primaria
-• nombre (varchar) → Nombre del módulo dentro del bootcamp
-• descripcion (varchar) → Descripción del módulo
-• fechaInicio (date) → Fecha de inicio del módulo
-• bootcamp_id (integer) → Clave foránea, referencia a Bootcamp
+Table Profesor {
+  profesor_id integer [primary key]
+  nombre varchar
+  apellido varchar
+  email varchar
+  telefono varchar
+  direccion varchar
+}
 
-Profesor
-• profesor_id (integer) → Clave primaria
-• nombre (varchar) → Nombre del profesor
-• apellido (varchar) → Apellido del profesor
-• email (varchar) → Correo electrónico
-• telefono (varchar) → Número de teléfono
-• direccion (varchar) → Dirección del profesor
-• modulo_id (integer) → Clave foránea, referencia a Módulo
+Table Profesor_Modulo {
+  profesor_id integer [ref: > Profesor.profesor_id]
+  modulo_id integer [ref: > Modulo.modulo_id]
+  fecha_asignacion date
+  carga_horaria integer
+  rol varchar
+  PRIMARY KEY (profesor_id, modulo_id)
+}
 
+Table Bootcamp_Profesor {
+  bootcamp_id integer [ref: > Bootcamp.bootcamp_id]
+  profesor_id integer [ref: > Profesor.profesor_id]
+  rol varchar
+  PRIMARY KEY (bootcamp_id, profesor_id)
+}
 
+Table Inscripcion {
+  inscripcion_id integer [primary key]
+  fechaInscripcion date
+  alumno_id integer [ref: > Alumno.alumno_id]
+  bootcamp_id integer [ref: > Bootcamp.bootcamp_id]
+  canal_id integer [ref: > Canal_Inscripcion.canal_id]
+  estadoInscripcion enum('pendiente', 'confirmada', 'cancelada', 'completada')
+}
+
+Table Canal_Inscripcion {
+  canal_id integer [primary key]
+  nombre varchar
+}
+
+Table Pago {
+  pago_id integer [primary key]
+  inscripcion_id integer [ref: > Inscripcion.inscripcion_id]
+  fechaPago date
+  montoPago decimal
+  billing_account_id varchar
+}
+
+Table IVR_Call {
+  ivr_call_id integer [primary key]
+  phone_number varchar
+  ivr_result varchar
+  vdn_label varchar
+  start_date date
+  start_date_id integer
+  end_date date
+  end_date_id integer
+  total_duration decimal(6,2)
+  customer_segment varchar
+  ivr_language varchar
+  inscripcion_id integer [ref: > Inscripcion.inscripcion_id]
+  canal_id integer [ref: > Canal_Inscripcion.canal_id]
+  alumno_id integer [ref: > Alumno.alumno_id]  
+}
+
+Table IVR_Module {
+  ivr_module_id integer [primary key]
+  ivr_call_id integer [ref: > IVR_Call.ivr_call_id]
+  module_sequence integer
+  module_name varchar
+  module_duration decimal(6,2)
+  module_result varchar
+}
+
+Table IVR_Step {
+  ivr_step_id integer [primary key]
+  ivr_module_id integer [ref: > IVR_Module.ivr_module_id]
+  ivr_call_id integer [ref: > IVR_Call.ivr_call_id]  
+  step_id integer
+  step_sequence integer
+  step_name varchar
+  step_result varchar
+  step_description_error varchar
+}
+
+```
 
 
 
