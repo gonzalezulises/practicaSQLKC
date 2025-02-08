@@ -53,7 +53,7 @@ DatosIVR AS (
 )
 
 -- Consulta final que une los datos de IVR y los datos del alumno
-SELECT
+SELECT DISTINCT ON (ivr.ivr_call_id) -- Seleccionamos solo un registro por llamada IVR
     ivr.ivr_call_id,
     ivr.numero_telefono,
     ivr.resultado_ivr,
@@ -67,22 +67,18 @@ SELECT
     ivr.idioma_ivr,
     ivr.id_canal_inscripcion,  -- Canal a través del cual se inscribió el alumno
     COALESCE(ivr.total_pasos_modulo, 0) AS total_pasos_modulo,  -- Aseguramos que no haya valores nulos
-    MAX(ivr.secuencia_modulo) AS secuencia_modulo, 
-    MAX(ivr.nombre_modulo) AS nombre_modulo, 
-    MAX(ivr.duracion_modulo) AS duracion_modulo, 
-    MAX(ivr.resultado_modulo) AS resultado_modulo, 
-    MAX(ivr.secuencia_paso) AS secuencia_paso, 
-    MAX(ivr.nombre_paso) AS nombre_paso, 
-    MAX(ivr.resultado_paso) AS resultado_paso, 
-    MAX(ivr.descripcion_error_paso) AS descripcion_error_paso, 
-    MAX(ins.tipo_documento) AS tipo_documento, 
-    MAX(ins.identificacion_documento) AS identificacion_documento, 
-    MAX(ins.telefono_cliente) AS telefono_cliente, 
-    MAX(ins.id_cuenta_facturacion) AS id_cuenta_facturacion  -- ID de cuenta de facturación
+    ivr.secuencia_modulo, 
+    ivr.nombre_modulo, 
+    ivr.duracion_modulo, 
+    ivr.resultado_modulo, 
+    ivr.secuencia_paso, 
+    ivr.nombre_paso, 
+    ivr.resultado_paso, 
+    ivr.descripcion_error_paso, 
+    ins.tipo_documento, 
+    ins.identificacion_documento, 
+    ins.telefono_cliente, 
+    ins.id_cuenta_facturacion  -- ID de cuenta de facturación
 FROM DatosIVR ivr
 LEFT JOIN DatosInscripcion ins ON ivr.ivr_call_id = ins.inscripcion_id  -- Relacionamos los datos IVR con la inscripción
-GROUP BY 
-    ivr.ivr_call_id, ivr.numero_telefono, ivr.resultado_ivr, ivr.etiqueta_vdn,
-    ivr.fecha_inicio, ivr.id_fecha_inicio, ivr.fecha_fin, ivr.id_fecha_fin, 
-    ivr.duracion_total, ivr.segmento_cliente, ivr.idioma_ivr, ivr.id_canal_inscripcion, 
-    ivr.total_pasos_modulo;
+ORDER BY ivr.ivr_call_id, ivr.fecha_inicio DESC;

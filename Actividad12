@@ -1,0 +1,63 @@
+CREATE TABLE ivr_summary (
+    ivr_id SERIAL PRIMARY KEY,            -- Identificador único de la llamada
+    phone_number VARCHAR(20) NOT NULL,    -- Número llamante
+    ivr_result VARCHAR(50),               -- Resultado de la llamada
+    vdn_aggregation VARCHAR(20),          -- Categoría del VDN
+
+    start_date TIMESTAMP,                 -- Fecha y hora de inicio de la llamada
+    end_date TIMESTAMP,                   -- Fecha y hora de fin de la llamada
+    total_duration INTEGER,               -- Duración total de la llamada en segundos
+    customer_segment VARCHAR(50),         -- Segmento del cliente
+
+    ivr_language VARCHAR(20),             -- Idioma usado en la IVR
+    steps_module INTEGER,                 -- Número de módulos por los que pasa la llamada
+    module_aggregation TEXT,              -- Lista de módulos visitados en la llamada
+
+    document_type VARCHAR(20),            -- Tipo de documento del cliente
+    document_identification VARCHAR(50),  -- Número de documento del cliente
+    customer_phone VARCHAR(20),           -- Número de teléfono del cliente
+    billing_account_id VARCHAR(50),       -- Número de cuenta de facturación del cliente
+
+    masiva_lg INTEGER DEFAULT 0,          -- Indicador de si pasó por el módulo AVERIA_MASIVA
+    info_by_phone_lg INTEGER DEFAULT 0,   -- Indicador de si se identificó por teléfono
+    info_by_dni_lg INTEGER DEFAULT 0,     -- Indicador de si se identificó por DNI
+    repeated_phone_24H INTEGER DEFAULT 0, -- Flag de llamada repetida en las últimas 24h
+    cause_recall_phone_24H INTEGER DEFAULT 0 -- Flag de posible recall en las siguientes 24h
+);
+
+-- Insertar datos en la tabla ivr_summary  
+
+INSERT INTO ivr_summary (
+    ivr_id, phone_number, ivr_result, vdn_aggregation,
+    start_date, end_date, total_duration, customer_segment,
+    ivr_language, steps_module, module_aggregation,
+    document_type, document_identification, customer_phone, billing_account_id,
+    masiva_lg, info_by_phone_lg, info_by_dni_lg, repeated_phone_24H, cause_recall_phone_24H
+)
+SELECT DISTINCT ON (d.calls_ivr_id) 
+    d.calls_ivr_id AS ivr_id,
+    d.calls_phone_number AS phone_number,
+    d.calls_ivr_result AS ivr_result,
+    d.vdn_aggregation,
+    d.calls_start_date AS start_date,
+    d.calls_end_date AS end_date,
+    d.calls_total_duration AS total_duration,
+    d.calls_customer_segment AS customer_segment,
+    d.calls_ivr_language AS ivr_language,
+    (SELECT COUNT(DISTINCT m.ivr_module_id) 
+     FROM IVR_Module m 
+     WHERE m.ivr_call_id = d.calls_ivr_id) AS steps_module,
+    (SELECT STRING_AGG(DISTINCT m.module_name, ', ') 
+     FROM IVR_Module m 
+     WHERE m.ivr_call_id = d.calls_ivr_id) AS module_aggregation,
+    d.document_type,
+    d.document_identification,
+    d.customer_phone,
+    d.billing_account_id,
+    d.masiva_lg,
+    d.info_by_phone_lg,
+    d.info_by_dni_lg,
+    d.repeated_phone_24H,
+    d.cause_recall_phone_24H
+FROM ivr_detail d
+ORDER BY d.calls_ivr_id, d.calls_start_date DESC;
