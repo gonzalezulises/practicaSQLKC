@@ -1,60 +1,55 @@
--- tabla Alumno
-CREATE TABLE Alumno (
-  alumno_id SERIAL PRIMARY KEY,
-  nombre VARCHAR(50) NOT NULL,
-  apellido VARCHAR(50) NOT NULL,
-  email VARCHAR(100) NOT NULL,
-  telefono VARCHAR(20) NOT NULL,
-  direccion VARCHAR(100) NOT NULL
+-- Tabla alumno
+CREATE OR REPLACE TABLE keepcoding.Alumno (
+  alumno_id STRING DEFAULT GENERATE_UUID(), -- Usamos UUID para claves primarias
+  nombre STRING NOT NULL,
+  apellido STRING NOT NULL,
+  email STRING NOT NULL,
+  telefono STRING NOT NULL,
+  direccion STRING NOT NULL
 );
 
--- tabla Bootcamp
-CREATE TABLE Bootcamp (
-  bootcamp_id SERIAL PRIMARY KEY,
-  nombre VARCHAR(50) NOT NULL,
-  descripcion VARCHAR(200) NOT NULL,
+-- Tabla Bootcamp
+CREATE OR REPLACE TABLE keepcoding.Bootcamp (
+  bootcamp_id STRING DEFAULT GENERATE_UUID(), -- UUID en lugar de SERIAL
+  nombre STRING NOT NULL,
+  descripcion STRING NOT NULL,
   fechaInicio DATE NOT NULL,
   fechaFin DATE NOT NULL
 );
 
--- tabla Modulo
-CREATE TABLE Modulo (
-  modulo_id SERIAL PRIMARY KEY,
-  nombre VARCHAR(50) NOT NULL,
-  descripcion VARCHAR(200) NOT NULL,
+-- Tabla Modulo
+CREATE OR REPLACE TABLE keepcoding.Modulo (
+  modulo_id STRING DEFAULT GENERATE_UUID(),
+  nombre STRING NOT NULL,
+  descripcion STRING NOT NULL,
   fechaInicio DATE NOT NULL,
-  bootcamp_id INTEGER NOT NULL,
-  FOREIGN KEY (bootcamp_id) REFERENCES Bootcamp(bootcamp_id)
+  bootcamp_id STRING NOT NULL -- Relación con Bootcamp
 );
 
--- tabla Inscripcion
-CREATE TABLE Inscripcion (
-  inscripcion_id SERIAL PRIMARY KEY,
-  alumno_id INTEGER NOT NULL,
-  bootcamp_id INTEGER NOT NULL,
+-- Tabla Inscripcion
+CREATE OR REPLACE TABLE keepcoding.Inscripcion (
+  inscripcion_id STRING DEFAULT GENERATE_UUID(),
+  alumno_id STRING NOT NULL, -- Relación con Alumno
+  bootcamp_id STRING NOT NULL, -- Relación con Bootcamp
   fechaInscripcion DATE NOT NULL,
-  estadoInscripcion VARCHAR(20) NOT NULL,
-  FOREIGN KEY (alumno_id) REFERENCES Alumno(alumno_id),
-  FOREIGN KEY (bootcamp_id) REFERENCES Bootcamp(bootcamp_id)
+  estadoInscripcion STRING NOT NULL
 );
 
--- tabla Pago
-CREATE TABLE Pago (
-  pago_id SERIAL PRIMARY KEY,
-  inscripcion_id INTEGER NOT NULL,
+-- Tabla Pago
+CREATE OR REPLACE TABLE keepcoding.Pago (
+  pago_id STRING DEFAULT GENERATE_UUID(),
+  inscripcion_id STRING NOT NULL, -- Relación con Inscripcion
   fechaPago DATE NOT NULL,
-  montoPago DECIMAL(10, 2) NOT NULL,
-  FOREIGN KEY (inscripcion_id) REFERENCES Inscripcion(inscripcion_id)
+  montoPago NUMERIC(10,2) NOT NULL -- BigQuery usa NUMERIC en vez de DECIMAL
 );
 
--- tabla Profesor
-CREATE TABLE Profesor (
-  profesor_id SERIAL PRIMARY KEY,
-  nombre VARCHAR(50) NOT NULL,
-  apellido VARCHAR(50) NOT NULL,
-  email VARCHAR(100) NOT NULL,
-  telefono VARCHAR(20) NOT NULL,
-  direccion VARCHAR(100) NOT NULL,
-  modulo_id INTEGER NOT NULL,
-  FOREIGN KEY (modulo_id) REFERENCES Modulo(modulo_id)
+-- Tabla Profesor
+CREATE OR REPLACE TABLE keepcoding.Profesor (
+  profesor_id STRING DEFAULT GENERATE_UUID(),
+  nombre STRING NOT NULL,
+  apellido STRING NOT NULL,
+  email STRING NOT NULL,
+  telefono STRING NOT NULL,
+  direccion STRING NOT NULL,
+  modulo_id STRING NOT NULL -- Relación con Modulo
 );
