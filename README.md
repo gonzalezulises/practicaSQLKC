@@ -52,7 +52,7 @@ A partir de los casos de uso, el sistema debe cumplir con los siguientes requisi
 
 ## 5️⃣ Entidades y Atributos 📊
 
-### 🏫 **Alumno**
+🏫 Alumno
 ```sql
 alumno_id INTEGER PRIMARY KEY, -- Identificador único
 nombre VARCHAR(50), 
@@ -105,6 +105,6 @@ modulo_id INTEGER REFERENCES Modulo(modulo_id)
 🔗 Diagrama Entidad-Relación
 
 📌 Ver el diseño en línea:
-📊 E/R Inicial - KeepCoding: https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8
+[📊 Ver el Diagrama E/R en dbdiagram.io](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
 
 
