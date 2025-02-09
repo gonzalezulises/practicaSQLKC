@@ -1,63 +1,66 @@
-CREATE TABLE ivr_summary (
-    ivr_id SERIAL PRIMARY KEY,            -- Identificador único de la llamada
-    phone_number VARCHAR(20) NOT NULL,    -- Número llamante
-    ivr_result VARCHAR(50),               -- Resultado de la llamada
-    vdn_aggregation VARCHAR(20),          -- Categoría del VDN
+CREATE OR REPLACE TABLE keepcoding.ivr_summary AS -- Crear la tabla ivr_summary consolidando la información más relevante de cada llamada
+WITH 
+ModuloData AS (  -- CTE para calcular los módulos por los que pasó cada llamada
+    SELECT 
+        calls_ivr_id, 
+        COUNT(DISTINCT module_name) AS steps_module, 
+        STRING_AGG(DISTINCT module_name, ', ') AS module_aggregation
+    FROM keepcoding.ivr_detail
+    GROUP BY calls_ivr_id
+),
 
-    start_date TIMESTAMP,                 -- Fecha y hora de inicio de la llamada
-    end_date TIMESTAMP,                   -- Fecha y hora de fin de la llamada
-    total_duration INTEGER,               -- Duración total de la llamada en segundos
-    customer_segment VARCHAR(50),         -- Segmento del cliente
+ClienteData AS (  -- CTE para obtener la información del cliente (Documento y Teléfono)
+    SELECT DISTINCT calls_ivr_id,
+        FIRST_VALUE(document_type) OVER (PARTITION BY calls_ivr_id ORDER BY calls_start_date DESC) AS document_type,
+        FIRST_VALUE(document_identification) OVER (PARTITION BY calls_ivr_id ORDER BY calls_start_date DESC) AS document_identification,
+        FIRST_VALUE(customer_phone) OVER (PARTITION BY calls_ivr_id ORDER BY calls_start_date DESC) AS customer_phone,
+        FIRST_VALUE(billing_account_id) OVER (PARTITION BY calls_ivr_id ORDER BY calls_start_date DESC) AS billing_account_id
+    FROM keepcoding.ivr_detail
+    WHERE document_type IS NOT NULL OR document_identification IS NOT NULL OR customer_phone IS NOT NULL OR billing_account_id IS NOT NULL
+),
 
-    ivr_language VARCHAR(20),             -- Idioma usado en la IVR
-    steps_module INTEGER,                 -- Número de módulos por los que pasa la llamada
-    module_aggregation TEXT,              -- Lista de módulos visitados en la llamada
-
-    document_type VARCHAR(20),            -- Tipo de documento del cliente
-    document_identification VARCHAR(50),  -- Número de documento del cliente
-    customer_phone VARCHAR(20),           -- Número de teléfono del cliente
-    billing_account_id VARCHAR(50),       -- Número de cuenta de facturación del cliente
-
-    masiva_lg INTEGER DEFAULT 0,          -- Indicador de si pasó por el módulo AVERIA_MASIVA
-    info_by_phone_lg INTEGER DEFAULT 0,   -- Indicador de si se identificó por teléfono
-    info_by_dni_lg INTEGER DEFAULT 0,     -- Indicador de si se identificó por DNI
-    repeated_phone_24H INTEGER DEFAULT 0, -- Flag de llamada repetida en las últimas 24h
-    cause_recall_phone_24H INTEGER DEFAULT 0 -- Flag de posible recall en las siguientes 24h
-);
-
--- Insertar datos en la tabla ivr_summary  
-
-INSERT INTO ivr_summary (
-    ivr_id, phone_number, ivr_result, vdn_aggregation,
-    start_date, end_date, total_duration, customer_segment,
-    ivr_language, steps_module, module_aggregation,
-    document_type, document_identification, customer_phone, billing_account_id,
-    masiva_lg, info_by_phone_lg, info_by_dni_lg, repeated_phone_24H, cause_recall_phone_24H
+FlagsData AS ( -- CTE para obtener los flags de identificación
+    SELECT calls_ivr_id,
+        MAX(masiva_lg) AS masiva_lg,
+        MAX(info_by_phone_lg) AS info_by_phone_lg,
+        MAX(info_by_dni_lg) AS info_by_dni_lg,
+        MAX(repeated_phone_24H) AS repeated_phone_24H,
+        MAX(cause_recall_phone_24H) AS cause_recall_phone_24H
+    FROM keepcoding.ivr_detail
+    GROUP BY calls_ivr_id
 )
-SELECT DISTINCT ON (d.calls_ivr_id) 
+SELECT  -- Consulta final consolidada
     d.calls_ivr_id AS ivr_id,
     d.calls_phone_number AS phone_number,
     d.calls_ivr_result AS ivr_result,
     d.vdn_aggregation,
     d.calls_start_date AS start_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_start_date)) AS INT64) AS calls_start_date_id,
     d.calls_end_date AS end_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_end_date)) AS INT64) AS calls_end_date_id,
     d.calls_total_duration AS total_duration,
     d.calls_customer_segment AS customer_segment,
     d.calls_ivr_language AS ivr_language,
-    (SELECT COUNT(DISTINCT m.ivr_module_id) 
-     FROM IVR_Module m 
-     WHERE m.ivr_call_id = d.calls_ivr_id) AS steps_module,
-    (SELECT STRING_AGG(DISTINCT m.module_name, ', ') 
-     FROM IVR_Module m 
-     WHERE m.ivr_call_id = d.calls_ivr_id) AS module_aggregation,
-    d.document_type,
-    d.document_identification,
-    d.customer_phone,
-    d.billing_account_id,
-    d.masiva_lg,
-    d.info_by_phone_lg,
-    d.info_by_dni_lg,
-    d.repeated_phone_24H,
-    d.cause_recall_phone_24H
-FROM ivr_detail d
-ORDER BY d.calls_ivr_id, d.calls_start_date DESC;
+    m.steps_module,     -- Módulos y pasos
+    m.module_aggregation,
+    c.document_type,     -- Datos del cliente
+    c.document_identification,
+    c.customer_phone,
+    c.billing_account_id,
+    f.masiva_lg,     -- Flags de identificación y comportamiento
+    f.info_by_phone_lg,
+    f.info_by_dni_lg,
+    f.repeated_phone_24H,
+    f.cause_recall_phone_24H
+
+FROM keepcoding.ivr_detail d
+LEFT JOIN ModuloData m ON d.calls_ivr_id = m.calls_ivr_id
+LEFT JOIN ClienteData c ON d.calls_ivr_id = c.calls_ivr_id
+LEFT JOIN FlagsData f ON d.calls_ivr_id = f.calls_ivr_id
+GROUP BY 
+    d.calls_ivr_id, d.calls_phone_number, d.calls_ivr_result, d.vdn_aggregation, -- Agrupamos por id de llamada
+    d.calls_start_date, d.calls_end_date, d.calls_total_duration,  -- Campos de fecha y duración
+    d.calls_customer_segment, d.calls_ivr_language, -- Segmento y lenguaje
+    m.steps_module, m.module_aggregation, -- Módulos y pasos
+    c.document_type, c.document_identification, c.customer_phone, c.billing_account_id, -- Datos del cliente
+    f.masiva_lg, f.info_by_phone_lg, f.info_by_dni_lg, f.repeated_phone_24H, f.cause_recall_phone_24H; -- Flags de identificación y comportamiento
