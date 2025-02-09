@@ -1,19 +1,38 @@
--- Aca voy a necesitar modificar la tabla ivr_detail para agregar billing_account_id
-ALTER TABLE ivr_detail ADD COLUMN billing_account_id VARCHAR(50);
--- Aca voy a necesitar modificar la tabla ivr_detail para agregar customer_id
-WITH DatosBilling AS (
-    -- CTE que obtiene el número de cuenta del cliente desde Pago o IVR_Step
+CREATE OR REPLACE VIEW keepcoding.ivr_detail_billing AS -- Vista que agrega la identificación del cliente a la tabla ivr_detail
+WITH IdentificacionCuenta AS (
     SELECT 
-        d.calls_ivr_id,
-        COALESCE(p.billing_account_id, s.step_billing_account) AS billing_account_id
-    FROM ivr_detail d
-    LEFT JOIN Inscripcion i ON d.calls_ivr_id = i.inscripcion_id
-    LEFT JOIN Pago p ON i.inscripcion_id = p.inscripcion_id
-    LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id
+        calls_ivr_id, 
+        billing_account_id,
+        ROW_NUMBER() OVER (PARTITION BY calls_ivr_id ORDER BY calls_start_date DESC) AS row_num -- Ordenamos por fecha de inicio
+    FROM keepcoding.ivr_detail
+    WHERE billing_account_id IS NOT NULL 
 )
 
--- Actualizar la tabla ivr_detail con el número de cuenta identificado
-UPDATE ivr_detail AS d
-SET billing_account_id = db.billing_account_id
-FROM DatosBilling db
-WHERE d.calls_ivr_id = db.calls_ivr_id;
+SELECT 
+    d.calls_ivr_id,
+    d.calls_phone_number,
+    d.calls_ivr_result,
+    d.calls_vdn_label,
+    d.calls_start_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_start_date)) AS INT64) AS calls_start_date_id,
+    d.calls_end_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_end_date)) AS INT64) AS calls_end_date_id,
+    d.calls_total_duration,
+    d.calls_customer_segment,
+    d.calls_ivr_language,
+    d.calls_steps_module,
+    d.calls_module_aggregation,
+    d.module_sequence,
+    d.module_name,
+    d.module_duration,
+    d.module_result,
+    d.step_sequence,
+    d.step_name,
+    d.step_result,
+    d.step_description_error,
+    ic.billing_account_id -- Asignamos un solo billing_account_id identificado por llamada
+
+FROM keepcoding.ivr_detail d
+LEFT JOIN IdentificacionCuenta ic 
+ON d.calls_ivr_id = ic.calls_ivr_id
+WHERE ic.row_num = 1; 

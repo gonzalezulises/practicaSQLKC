@@ -1,22 +1,36 @@
-ALTER TABLE ivr_detail ADD COLUMN masiva_lg INTEGER DEFAULT 0; -- Aca voy a necesitar modificar la tabla ivr_detail para agregar masiva_lg
-WITH IdentificacionMasiva AS (
-    -- CTE que verifica si la llamada pasó por el módulo AVERIA_MASIVA
+CREATE OR REPLACE VIEW keepcoding.ivr_detail_masiva AS
+WITH MasivaFlag AS (
     SELECT 
-        d.calls_ivr_id,
-        CASE 
-            WHEN EXISTS ( -- Verificamos si existe al menos un módulo AVERIA_MASIVA
-                SELECT 1 
-                FROM IVR_Module m 
-                WHERE m.ivr_call_id = d.calls_ivr_id  -- Relacionamos el módulo con la llamada
-                AND m.module_name = 'AVERIA_MASIVA' -- Filtro por el nombre del módulo
-            ) THEN 1
-            ELSE 0
-        END AS masiva_lg
-    FROM ivr_detail d
+        calls_ivr_id, 
+        MAX(CASE WHEN module_name = 'AVERIA_MASIVA' THEN 1 ELSE 0 END) AS masiva_lg -- Identificamos si la llamada pasó por el módulo 'AVERIA_MASIVA'
+    FROM keepcoding.ivr_detail
+    GROUP BY calls_ivr_id
 )
 
--- Actualizar la tabla ivr_detail con el flag `masiva_lg`
-UPDATE ivr_detail AS d
-SET masiva_lg = im.masiva_lg
-FROM IdentificacionMasiva im
-WHERE d.calls_ivr_id = im.calls_ivr_id;
+SELECT 
+    d.calls_ivr_id,
+    d.calls_phone_number,
+    d.calls_ivr_result,
+    d.calls_vdn_label,
+    d.calls_start_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_start_date)) AS INT64) AS calls_start_date_id,
+    d.calls_end_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_end_date)) AS INT64) AS calls_end_date_id,
+    d.calls_total_duration,
+    d.calls_customer_segment,
+    d.calls_ivr_language,
+    d.calls_steps_module,
+    d.calls_module_aggregation,
+    d.module_sequence,
+    d.module_name,
+    d.module_duration,
+    d.module_result,
+    d.step_sequence,
+    d.step_name,
+    d.step_result,
+    d.step_description_error,
+    mf.masiva_lg -- Agregamos el flag masiva_lg (1 si pasó por AVERIA_MASIVA, 0 si no)
+
+FROM keepcoding.ivr_detail d
+LEFT JOIN MasivaFlag mf 
+ON d.calls_ivr_id = mf.calls_ivr_id;

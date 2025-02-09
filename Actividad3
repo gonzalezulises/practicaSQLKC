@@ -1,84 +1,29 @@
--- CTE que cuenta la cantidad de pasos en cada módulo IVR
-WITH ConteoPasos AS (
-    SELECT 
-        ivr_module_id, 
-        COUNT(ivr_step_id) AS total_pasos_modulo  -- Contamos los pasos dentro de cada módulo IVR
-    FROM IVR_Step
-    GROUP BY ivr_module_id
-),
-
--- CTE que consolida la información de inscripción, alumno y pago
-DatosInscripcion AS (
-    SELECT 
-        i.inscripcion_id,
-        a.document_type AS tipo_documento,  -- Tipo de documento del alumno
-        a.document_identification AS identificacion_documento,  -- Identificación del alumno
-        a.telefono AS telefono_cliente,  -- Teléfono del alumno
-        p.billing_account_id AS id_cuenta_facturacion  -- ID de cuenta de facturación del pago
-    FROM Inscripcion i
-    INNER JOIN Alumno a ON i.alumno_id = a.alumno_id  -- Relacionamos la inscripción con el alumno
-    LEFT JOIN Pago p ON i.inscripcion_id = p.inscripcion_id  -- Relacionamos la inscripción con los pagos
-),
-
--- CTE que une IVR_Call con IVR_Module y IVR_Step, agregando detalles de la interacción
-DatosIVR AS (
-    SELECT 
-        c.ivr_call_id,
-        c.phone_number AS numero_telefono,  -- Número de teléfono de la llamada IVR
-        c.ivr_result AS resultado_ivr,  -- Resultado de la llamada IVR
-        c.vdn_label AS etiqueta_vdn,  -- Etiqueta VDN de la llamada
-        c.start_date AS fecha_inicio,
-        EXTRACT(YEAR FROM c.start_date) * 10000 + EXTRACT(MONTH FROM c.start_date) * 100 + EXTRACT(DAY FROM c.start_date) AS id_fecha_inicio,  -- Fecha inicio en formato YYYYMMDD
-        c.end_date AS fecha_fin,
-        EXTRACT(YEAR FROM c.end_date) * 10000 + EXTRACT(MONTH FROM c.end_date) * 100 + EXTRACT(DAY FROM c.end_date) AS id_fecha_fin,  -- Fecha fin en formato YYYYMMDD
-        c.total_duration AS duracion_total,  -- Duración total de la llamada
-        c.customer_segment AS segmento_cliente,  -- Segmento de cliente
-        c.ivr_language AS idioma_ivr,  -- Idioma usado en el IVR
-        c.canal_id AS id_canal_inscripcion,  -- ID del canal de inscripción (WhatsApp, Email, etc.)
-        m.ivr_module_id,
-        m.module_sequence AS secuencia_modulo,  -- Secuencia del módulo en la llamada IVR
-        m.module_name AS nombre_modulo,  -- Nombre del módulo IVR
-        m.module_duration AS duracion_modulo,  -- Duración del módulo IVR
-        m.module_result AS resultado_modulo,  -- Resultado del módulo IVR
-        s.ivr_step_id,
-        s.step_sequence AS secuencia_paso,  -- Secuencia del paso dentro del módulo
-        s.step_name AS nombre_paso,  -- Nombre del paso dentro del módulo
-        s.step_result AS resultado_paso,  -- Resultado del paso dentro del módulo
-        s.step_description_error AS descripcion_error_paso,  -- Descripción del error (si aplica)
-        cp.total_pasos_modulo  -- Número total de pasos en el módulo IVR
-    FROM IVR_Call c
-    LEFT JOIN IVR_Module m ON c.ivr_call_id = m.ivr_call_id  -- Relacionamos la llamada con los módulos IVR
-    LEFT JOIN IVR_Step s ON m.ivr_module_id = s.ivr_module_id  -- Relacionamos los módulos IVR con los pasos
-    LEFT JOIN ConteoPasos cp ON m.ivr_module_id = cp.ivr_module_id  -- Unimos la cantidad de pasos en cada módulo
+CREATE TABLE keepcoding.ivr_detail (
+    calls_ivr_id STRING,  -- Identificador único de la llamada
+    calls_phone_number STRING,  -- Número de teléfono del usuario
+    calls_ivr_result STRING,  -- Resultado de la llamada IVR
+    calls_vdn_label STRING,  -- Etiqueta VDN de la llamada
+    calls_start_date TIMESTAMP,  -- Fecha y hora de inicio de la llamada
+    calls_start_date_id INT64,  -- Fecha de inicio en formato YYYYMMDD
+    calls_end_date TIMESTAMP,  -- Fecha y hora de finalización de la llamada
+    calls_end_date_id INT64,  -- Fecha de fin en formato YYYYMMDD
+    calls_total_duration INT64,  -- Duración total de la llamada en segundos
+    calls_customer_segment STRING,  -- Segmento del cliente
+    calls_ivr_language STRING,  -- Idioma utilizado en la IVR
+    calls_steps_module INT64,  -- Número total de pasos en los módulos
+    calls_module_aggregation STRING,  -- Lista de módulos visitados en la llamada
+    module_sequence INT64,  -- Secuencia del módulo en la llamada
+    module_name STRING,  -- Nombre del módulo IVR
+    module_duration INT64,  -- Duración del módulo IVR
+    module_result STRING,  -- Resultado del módulo IVR
+    step_sequence INT64,  -- Secuencia del paso dentro del módulo
+    step_name STRING,  -- Nombre del paso dentro del módulo
+    step_result STRING,  -- Resultado del paso dentro del módulo
+    step_description_error STRING,  -- Descripción del error en el paso
+    document_type STRING,  -- Tipo de documento del cliente
+    document_identification STRING,  -- Número de identificación del cliente
+    customer_phone STRING,  -- Teléfono del cliente
+    billing_account_id STRING  -- ID de cuenta de facturación
 )
-
--- Consulta final que une los datos de IVR y los datos del alumno
-SELECT DISTINCT ON (ivr.ivr_call_id) -- Seleccionamos solo un registro por llamada IVR
-    ivr.ivr_call_id,
-    ivr.numero_telefono,
-    ivr.resultado_ivr,
-    ivr.etiqueta_vdn,
-    ivr.fecha_inicio,
-    ivr.id_fecha_inicio,
-    ivr.fecha_fin,
-    ivr.id_fecha_fin,
-    ivr.duracion_total,
-    ivr.segmento_cliente,
-    ivr.idioma_ivr,
-    ivr.id_canal_inscripcion,  -- Canal a través del cual se inscribió el alumno
-    COALESCE(ivr.total_pasos_modulo, 0) AS total_pasos_modulo,  -- Aseguramos que no haya valores nulos
-    ivr.secuencia_modulo, 
-    ivr.nombre_modulo, 
-    ivr.duracion_modulo, 
-    ivr.resultado_modulo, 
-    ivr.secuencia_paso, 
-    ivr.nombre_paso, 
-    ivr.resultado_paso, 
-    ivr.descripcion_error_paso, 
-    ins.tipo_documento, 
-    ins.identificacion_documento, 
-    ins.telefono_cliente, 
-    ins.id_cuenta_facturacion  -- ID de cuenta de facturación
-FROM DatosIVR ivr
-LEFT JOIN DatosInscripcion ins ON ivr.ivr_call_id = ins.inscripcion_id  -- Relacionamos los datos IVR con la inscripción
-ORDER BY ivr.ivr_call_id, ivr.fecha_inicio DESC;
+PARTITION BY DATE(calls_start_date)  -- Particionamos por fecha de inicio para optimizar consultas
+CLUSTER BY calls_phone_number;  -- Clustering por número de teléfono para mejorar rendimiento
