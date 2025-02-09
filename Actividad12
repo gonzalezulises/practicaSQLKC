@@ -1,6 +1,5 @@
-CREATE OR REPLACE TABLE keepcoding.ivr_summary AS -- Crear la tabla ivr_summary consolidando la información más relevante de cada llamada
 WITH 
-ModuloData AS (  -- CTE para calcular los módulos por los que pasó cada llamada
+ModuloData AS ( -- CTE para calcular los módulos por los que pasó cada llamada
     SELECT 
         calls_ivr_id, 
         COUNT(DISTINCT module_name) AS steps_module, 
@@ -9,7 +8,7 @@ ModuloData AS (  -- CTE para calcular los módulos por los que pasó cada llamad
     GROUP BY calls_ivr_id
 ),
 
-ClienteData AS (  -- CTE para obtener la información del cliente (Documento y Teléfono)
+ClienteData AS ( -- CTE para obtener la información del cliente (Documento y Teléfono) 
     SELECT DISTINCT calls_ivr_id,
         FIRST_VALUE(document_type) OVER (PARTITION BY calls_ivr_id ORDER BY calls_start_date DESC) AS document_type,
         FIRST_VALUE(document_identification) OVER (PARTITION BY calls_ivr_id ORDER BY calls_start_date DESC) AS document_identification,
@@ -19,17 +18,21 @@ ClienteData AS (  -- CTE para obtener la información del cliente (Documento y T
     WHERE document_type IS NOT NULL OR document_identification IS NOT NULL OR customer_phone IS NOT NULL OR billing_account_id IS NOT NULL
 ),
 
-FlagsData AS ( -- CTE para obtener los flags de identificación
-    SELECT calls_ivr_id,
-        MAX(masiva_lg) AS masiva_lg,
-        MAX(info_by_phone_lg) AS info_by_phone_lg,
-        MAX(info_by_dni_lg) AS info_by_dni_lg,
-        MAX(repeated_phone_24H) AS repeated_phone_24H,
-        MAX(cause_recall_phone_24H) AS cause_recall_phone_24H
-    FROM keepcoding.ivr_detail
-    GROUP BY calls_ivr_id
+FlagsData AS ( -- CTE para obtener los flags de identificación (con JOIN a ivr_detail_masiva)
+    SELECT d.calls_ivr_id,
+        MAX(masiva.masiva_lg) AS masiva_lg,
+        MAX(d.info_by_phone_lg) AS info_by_phone_lg,
+        MAX(d.info_by_dni_lg) AS info_by_dni_lg,
+        MAX(d.repeated_phone_24H) AS repeated_phone_24H,
+        MAX(d.cause_recall_phone_24H) AS cause_recall_phone_24H
+    FROM keepcoding.ivr_detail d
+    LEFT JOIN keepcoding.ivr_detail_masiva masiva 
+        ON d.calls_ivr_id = masiva.calls_ivr_id  -- Incluimos la columna correctamente
+    GROUP BY d.calls_ivr_id
 )
-SELECT  -- Consulta final consolidada
+
+
+SELECT -- Consulta final consolidada
     d.calls_ivr_id AS ivr_id,
     d.calls_phone_number AS phone_number,
     d.calls_ivr_result AS ivr_result,
@@ -43,7 +46,7 @@ SELECT  -- Consulta final consolidada
     d.calls_ivr_language AS ivr_language,
     m.steps_module,     -- Módulos y pasos
     m.module_aggregation,
-    c.document_type,     -- Datos del cliente
+    c.document_type,   -- Datos del cliente
     c.document_identification,
     c.customer_phone,
     c.billing_account_id,
@@ -59,7 +62,7 @@ LEFT JOIN ClienteData c ON d.calls_ivr_id = c.calls_ivr_id
 LEFT JOIN FlagsData f ON d.calls_ivr_id = f.calls_ivr_id
 GROUP BY 
     d.calls_ivr_id, d.calls_phone_number, d.calls_ivr_result, d.vdn_aggregation, -- Agrupamos por id de llamada
-    d.calls_start_date, d.calls_end_date, d.calls_total_duration,  -- Campos de fecha y duración
+    d.calls_start_date, d.calls_end_date, d.calls_total_duration, -- Campos de fecha y duración
     d.calls_customer_segment, d.calls_ivr_language, -- Segmento y lenguaje
     m.steps_module, m.module_aggregation, -- Módulos y pasos
     c.document_type, c.document_identification, c.customer_phone, c.billing_account_id, -- Datos del cliente
