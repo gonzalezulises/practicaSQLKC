@@ -122,7 +122,7 @@ A partir de los casos de uso, el sistema debe cumplir con los siguientes requisi
 
 # 5️⃣ Entidades y Atributos 📊
 
-Link al 🔗 [Diagrama Entidad-Relación](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8)
+Link al 🔗 [Diagrama Entidad-Relación](https://dbdiagram.io/d/E/R-inicial-679e65b9263d6cf9a0b914a8) En su version 1.0
 
 ```sql
 
