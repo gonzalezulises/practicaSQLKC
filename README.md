@@ -2,30 +2,17 @@
 
 Descripcion de la actividad [Practica SQL y DW](https://drive.google.com/file/d/1M6gLWsdVLbMGbEDw1aZ7Qm4MtcoS-GyA/view?usp=sharing)
 
-En Big query el proyecto se identifica como:
-
-Número de proyecto: 52153624215 
+En Big query el proyecto se identifica como número de proyecto: 52153624215 
 ID del proyecto: sql-dwulises 
 [vinculo](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1ssql-dwulises!2skeepcoding)
 
 # **Configuración Utilizada en la Práctica**
 
 ## **🖥️ Configuración del Entorno**
-Esta práctica se realizó utilizando **Visual Studio Code**, **TablePlus** y otras herramientas para el desarrollo y análisis de bases de datos. En macOS Sequoia 15.3
-
-### **🛠️ Versión de Visual Studio Code**
-Para verificar la versión instalada:
-
-```sh
-code  1.97.0 33fc5a94a3f99ebe7087e8fe79fbe1d37a251016 arm64
-```
+Esta práctica se realizó utilizando **Visual Studio Code** en una macOS Sequoia 15.3. Versión de Visual Studio Code 1.97.0 arm64
 
 ### **📦 Extensiones Instaladas**
 Se utilizaron las siguientes extensiones en VS Code:
-
-```sh
-code --list-extensions --show-versions
-```
 
 | Extensión | Identificador | Versión |
 |-----------|--------------|---------|
@@ -42,8 +29,6 @@ code --list-extensions --show-versions
 | TablePlus Integration | `tableplus.tableplus` | 6.2.1 |
 | Tembo PostgreSQL | `tembo.postgresql` | https://tembo.io/ |
 
----
-
 ## **🛠️ Tecnologías Utilizadas**
 En esta práctica se emplearon las siguientes herramientas y tecnologías:
 
@@ -55,23 +40,12 @@ En esta práctica se emplearon las siguientes herramientas y tecnologías:
 - **Automatización & AI:** GitHub Copilot, GitHub Copilot Chat
 - **Diagramación de Bases de Datos:** [dbdiagram.io](https://dbdiagram.io/)
 
----
-
 ## **🤖 Uso de Inteligencia Artificial**
 Durante la práctica, se usaron herramientas de IA para asistir en la codificación y la generación de código SQL:
 
 - **GitHub Copilot** → Sugerencias de código en tiempo real dentro de Visual Studio Code.
 - **GitHub Copilot Chat** → Generación de explicaciones y asistencia en SQL, Python y otras tecnologías.
 - **Google Translate** → Traducción de documentación técnica.
-
----
-
-### **📊 Herramientas para la Diagramación**
-Se utilizó [dbdiagram.io](https://dbdiagram.io/) para la creación y documentación del modelo relacional de la base de datos.
-
----
-
-
 
 ## 📌 Índice de Actividades 🔗
 
