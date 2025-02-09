@@ -1,15 +1,36 @@
-WITH IdentificacionDNI AS (
-    -- CTE que determina si la llamada pasó por el step `CUSTOMERINFOBYDNI.TX` con resultado 'OK'
+CREATE OR REPLACE VIEW keepcoding.ivr_detail_info_by_dni AS -- Crear una vista en BigQuery que asigna un flag info_by_dni_lg por llamada
+WITH InfoByDNI AS (  -- Identificamos si la llamada pasó por el paso 'CUSTOMERINFOBYDNI.TX' con resultado 'OK'
     SELECT 
-        d.calls_ivr_id,
-        BOOL_OR(s.step_name = 'CUSTOMERINFOBYDNI.TX' AND s.step_result = 'OK')::INT AS info_by_dni_lg -- 1 si pasó por el step, 0 si no
-    FROM ivr_detail d
-    LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id
-    GROUP BY d.calls_ivr_id
+        calls_ivr_id, 
+        MAX(CASE WHEN step_name = 'CUSTOMERINFOBYDNI.TX' AND step_result = 'OK' THEN 1 ELSE 0 END) AS info_by_dni_lg
+    FROM keepcoding.ivr_detail
+    GROUP BY calls_ivr_id
 )
 
--- Actualizando la tabla `ivr_detail` con el flag `info_by_dni_lg`
-UPDATE ivr_detail AS d
-SET info_by_dni_lg = idni.info_by_dni_lg
-FROM IdentificacionDNI idni
-WHERE d.calls_ivr_id = idni.calls_ivr_id;
+SELECT 
+    d.calls_ivr_id,
+    d.calls_phone_number,
+    d.calls_ivr_result,
+    d.calls_vdn_label,
+    d.calls_start_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_start_date)) AS INT64) AS calls_start_date_id,
+    d.calls_end_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_end_date)) AS INT64) AS calls_end_date_id,
+    d.calls_total_duration,
+    d.calls_customer_segment,
+    d.calls_ivr_language,
+    d.calls_steps_module,
+    d.calls_module_aggregation,
+    d.module_sequence,
+    d.module_name,
+    d.module_duration,
+    d.module_result,
+    d.step_sequence,
+    d.step_name,
+    d.step_result,
+    d.step_description_error,
+    ibd.info_by_dni_lg  -- Agregamos el flag info_by_dni_lg (1 si pasó por CUSTOMERINFOBYDNI.TX con resultado OK, 0 si no)
+
+FROM keepcoding.ivr_detail d
+LEFT JOIN InfoByDNI ibd 
+ON d.calls_ivr_id = ibd.calls_ivr_id;

@@ -1,34 +1,66 @@
-WITH 
-LlamadasPrevias AS (
-    -- CTE para detectar llamadas previas en las 24h anteriores
-    SELECT d1.calls_ivr_id, 1 AS repeated_phone_24H
-    FROM ivr_detail d1
-    WHERE EXISTS (
-        SELECT 1 
-        FROM ivr_detail d2
-        WHERE d2.calls_phone_number = d1.calls_phone_number
-        AND d2.calls_start_date BETWEEN d1.calls_start_date - INTERVAL '1 day' 
-                                    AND d1.calls_start_date - INTERVAL '1 second'
-    )
+CREATE OR REPLACE VIEW keepcoding.ivr_detail_repeated_phone AS  -- Vista que agrega los flags repeated_phone_24H y cause_recall_phone_24H
+WITH LlamadasAnteriores AS (                                    -- Identificamos si el número de teléfono tuvo una llamada en las 24 horas anteriores
+    
+    SELECT 
+        d1.calls_ivr_id,
+        d1.calls_phone_number,
+        MAX(CASE 
+            WHEN d2.calls_ivr_id IS NOT NULL THEN 1 
+            ELSE 0 
+        END) AS repeated_phone_24H
+    FROM keepcoding.ivr_detail d1
+    LEFT JOIN keepcoding.ivr_detail d2 
+        ON d1.calls_phone_number = d2.calls_phone_number
+        AND d2.calls_start_date BETWEEN TIMESTAMP_SUB(d1.calls_start_date, INTERVAL 24 HOUR) 
+                                   AND d1.calls_start_date
+        AND d1.calls_ivr_id <> d2.calls_ivr_id
+    GROUP BY d1.calls_ivr_id, d1.calls_phone_number
 ),
-LlamadasPosteriores AS (
-    -- CTE para detectar llamadas en las 24h posteriores
-    SELECT d1.calls_ivr_id, 1 AS cause_recall_phone_24H
-    FROM ivr_detail d1
-    WHERE EXISTS (
-        SELECT 1 
-        FROM ivr_detail d3
-        WHERE d3.calls_phone_number = d1.calls_phone_number
-        AND d3.calls_start_date BETWEEN d1.calls_start_date + INTERVAL '1 second' 
-                                    AND d1.calls_start_date + INTERVAL '1 day'
-    )
+
+LlamadasPosteriores AS ( -- Identificamos si el número de teléfono tuvo una llamada en las siguientes 24 horas
+    SELECT 
+        d1.calls_ivr_id,
+        d1.calls_phone_number,
+        MAX(CASE 
+            WHEN d2.calls_ivr_id IS NOT NULL THEN 1 
+            ELSE 0 
+        END) AS cause_recall_phone_24H
+    FROM keepcoding.ivr_detail d1
+    LEFT JOIN keepcoding.ivr_detail d2 
+        ON d1.calls_phone_number = d2.calls_phone_number
+        AND d2.calls_start_date BETWEEN d1.calls_start_date 
+                                   AND TIMESTAMP_ADD(d1.calls_start_date, INTERVAL 24 HOUR)
+        AND d1.calls_ivr_id <> d2.calls_ivr_id
+    GROUP BY d1.calls_ivr_id, d1.calls_phone_number
 )
 
--- Actualizar la tabla `ivr_detail` con los valores de los flags
-UPDATE ivr_detail AS d
-SET 
-    repeated_phone_24H = COALESCE(lp.repeated_phone_24H, 0),
-    cause_recall_phone_24H = COALESCE(lpo.cause_recall_phone_24H, 0)
-FROM LlamadasPrevias lp
-FULL OUTER JOIN LlamadasPosteriores lpo ON lp.calls_ivr_id = lpo.calls_ivr_id
-WHERE d.calls_ivr_id = COALESCE(lp.calls_ivr_id, lpo.calls_ivr_id);
+SELECT 
+    d.calls_ivr_id,
+    d.calls_phone_number,
+    d.calls_ivr_result,
+    d.calls_vdn_label,
+    d.calls_start_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_start_date)) AS INT64) AS calls_start_date_id,
+    d.calls_end_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_end_date)) AS INT64) AS calls_end_date_id,
+    d.calls_total_duration,
+    d.calls_customer_segment,
+    d.calls_ivr_language,
+    d.calls_steps_module,
+    d.calls_module_aggregation,
+    d.module_sequence,
+    d.module_name,
+    d.module_duration,
+    d.module_result,
+    d.step_sequence,
+    d.step_name,
+    d.step_result,
+    d.step_description_error,
+    la.repeated_phone_24H,  -- Agregamos los flags repeated_phone_24H y cause_recall_phone_24H
+    lp.cause_recall_phone_24H
+
+FROM keepcoding.ivr_detail d
+LEFT JOIN LlamadasAnteriores la 
+ON d.calls_ivr_id = la.calls_ivr_id
+LEFT JOIN LlamadasPosteriores lp 
+ON d.calls_ivr_id = lp.calls_ivr_id;

@@ -1,22 +1,36 @@
-ALTER TABLE ivr_detail ADD COLUMN info_by_phone_lg INTEGER DEFAULT 0; -- Aca voy a necesitar modificar la tabla ivr_detail para agregar info_by_phone_lg
-WITH IdentificacionTelefono AS (
-    -- CTE que marca con 1 si el cliente fue identificado por teléfono
+CREATE OR REPLACE VIEW keepcoding.ivr_detail_info_by_phone AS -- Crear una vista en BigQuery que asigna un flag info_by_phone_lg por llamada
+WITH InfoByPhone AS (                                         -- Identificamos si la llamada pasó por el paso 'CUSTOMERINFOBYPHONE.TX' con resultado 'OK'
     SELECT 
-        d.calls_ivr_id,
-        CASE 
-            WHEN COUNT(s.ivr_step_id) FILTER (
-                WHERE s.step_name = 'CUSTOMERINFOBYPHONE.TX' -- Filtro por el nombre del paso
-                AND s.step_result = 'OK' -- Filtro por el resultado del paso 
-            ) > 0 THEN 1
-            ELSE 0
-        END AS info_by_phone_lg
-    FROM ivr_detail d
-    LEFT JOIN IVR_Step s ON d.calls_ivr_id = s.ivr_call_id
-    GROUP BY d.calls_ivr_id
+        calls_ivr_id, 
+        MAX(CASE WHEN step_name = 'CUSTOMERINFOBYPHONE.TX' AND step_result = 'OK' THEN 1 ELSE 0 END) AS info_by_phone_lg
+    FROM keepcoding.ivr_detail
+    GROUP BY calls_ivr_id
 )
 
--- Actualizar la tabla ivr_detail con el flag `info_by_phone_lg`
-UPDATE ivr_detail AS d
-SET info_by_phone_lg = it.info_by_phone_lg
-FROM IdentificacionTelefono it
-WHERE d.calls_ivr_id = it.calls_ivr_id;
+SELECT 
+    d.calls_ivr_id,
+    d.calls_phone_number,
+    d.calls_ivr_result,
+    d.calls_vdn_label,
+    d.calls_start_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_start_date)) AS INT64) AS calls_start_date_id,
+    d.calls_end_date,
+    SAFE_CAST(FORMAT_DATE('%Y%m%d', DATE(d.calls_end_date)) AS INT64) AS calls_end_date_id,
+    d.calls_total_duration,
+    d.calls_customer_segment,
+    d.calls_ivr_language,
+    d.calls_steps_module,
+    d.calls_module_aggregation,
+    d.module_sequence,
+    d.module_name,
+    d.module_duration,
+    d.module_result,
+    d.step_sequence,
+    d.step_name,
+    d.step_result,
+    d.step_description_error,
+    ibp.info_by_phone_lg   -- Agregamos el flag info_by_phone_lg (1 si pasó por CUSTOMERINFOBYPHONE.TX con resultado OK, 0 si no)
+
+FROM keepcoding.ivr_detail d
+LEFT JOIN InfoByPhone ibp 
+ON d.calls_ivr_id = ibp.calls_ivr_id;
