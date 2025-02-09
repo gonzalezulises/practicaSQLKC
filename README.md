@@ -1,24 +1,95 @@
 # Practica avanzada de SQL
 
-Descricpcion de la actividad [Practica SQL y DW](https://drive.google.com/file/d/1M6gLWsdVLbMGbEDw1aZ7Qm4MtcoS-GyA/view?usp=sharing)
+Descripcion de la actividad [Practica SQL y DW](https://drive.google.com/file/d/1M6gLWsdVLbMGbEDw1aZ7Qm4MtcoS-GyA/view?usp=sharing)
+
+En Big query el proyecto se identifica como:
+
+Número de proyecto: 52153624215 
+ID del proyecto: sql-dwulises 
+[vinculo](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1ssql-dwulises!2skeepcoding)
+
+# **Configuración Utilizada en la Práctica**
+
+## **🖥️ Configuración del Entorno**
+Esta práctica se realizó utilizando **Visual Studio Code**, **TablePlus** y otras herramientas para el desarrollo y análisis de bases de datos. En macOS Sequoia 15.3
+
+### **🛠️ Versión de Visual Studio Code**
+Para verificar la versión instalada:
+
+```sh
+code  1.97.0 33fc5a94a3f99ebe7087e8fe79fbe1d37a251016 arm64
+```
+
+### **📦 Extensiones Instaladas**
+Se utilizaron las siguientes extensiones en VS Code:
+
+```sh
+code --list-extensions --show-versions
+```
+
+| Extensión | Identificador | Versión |
+|-----------|--------------|---------|
+| Markdown Lint | `davidanson.vscode-markdownlint` | 0.58.2 |
+| GitLens | `eamodio.gitlens` | 16.2.2 |
+| HTML & CSS Support | `ecmel.vscode-html-css` | 2.0.13 |
+| EditorConfig | `editorconfig.editorconfig` | 0.16.7 |
+| Prettier | `esbenp.prettier-vscode` | 11.0.0 |
+| Google Translate | `funkyremi.vscode-google-translate` | 1.4.13 |
+| GitHub Codespaces | `github.codespaces` | 1.17.3 |
+| GitHub Copilot | `github.copilot` | 1.266.0 |
+| GitHub Copilot Chat | `github.copilot-chat` | 0.24.0 |
+| GitHub PRs & Issues | `github.vscode-pull-request-github` | 0.104.0 |
+| TablePlus Integration | `tableplus.tableplus` | 6.2.1 |
+| Tembo PostgreSQL | `tembo.postgresql` | https://tembo.io/ |
+
+---
+
+## **🛠️ Tecnologías Utilizadas**
+En esta práctica se emplearon las siguientes herramientas y tecnologías:
+
+- **Control de Versiones:** GitHub desktop + GitHub
+- **Bases de Datos:** PostgreSQL (administrado con **TablePlus** y **Tembo**) para los ejercicios 2 al 5
+- **Desarrollo SQL:** Google BigQuery (el proyecto completo)
+- **Editor de Código:** Visual Studio Code
+- **Gestión de Configuración:** EditorConfig, Prettier
+- **Automatización & AI:** GitHub Copilot, GitHub Copilot Chat
+- **Diagramación de Bases de Datos:** [dbdiagram.io](https://dbdiagram.io/)
+
+---
+
+## **🤖 Uso de Inteligencia Artificial**
+Durante la práctica, se usaron herramientas de IA para asistir en la codificación y la generación de código SQL:
+
+- **GitHub Copilot** → Sugerencias de código en tiempo real dentro de Visual Studio Code.
+- **GitHub Copilot Chat** → Generación de explicaciones y asistencia en SQL, Python y otras tecnologías.
+- **Google Translate** → Traducción de documentación técnica.
+
+---
+
+### **📊 Herramientas para la Diagramación**
+Se utilizó [dbdiagram.io](https://dbdiagram.io/) para la creación y documentación del modelo relacional de la base de datos.
+
+---
+
+
 
 ## 📌 Índice de Actividades 🔗
 
 | #  | Actividad | Enlace |
 |----|----------|--------|
-| 1️⃣ | **Diagrama Entidad-Relación v1.0** | [Ir a actividad](#1-diagrama-entidad-relacion) |
+| 1️⃣ | **Diagrama Entidad-Relación v3.0** | [Ir a actividad](https://dbdiagram.io/d/PRACTICA-SQL-Y-DW-679d9f4b263d6cf9a0b10be5) |
 | 2️⃣ | **Creación de Base de Datos** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad2) |
-| 3️⃣ | **Crear Tabla `ivr_detail`** | [Ir a actividad](#3-crear-tabla-ivr_detail) |
-| 4️⃣ | **Generar campo `vdn_aggregation`** | [Ir a actividad](#4-generar-el-campo-vdn_aggregation) |
-| 5️⃣ | **Generar `document_type` y `document_identification`** | [Ir a actividad](#5-generar-los-campos-document_type-y-document_identification) |
-| 6️⃣ | **Generar el campo `customer_phone`** | [Ir a actividad](#6-generar-el-campo-customer_phone) |
-| 7️⃣ | **Generar el campo `billing_account_id`** | [Ir a actividad](#7-generar-el-campo-billing_account_id) |
-| 8️⃣ | **Generar el campo `masiva_lg`** | [Ir a actividad](#8-generar-el-campo-masiva_lg) |
-| 9️⃣ | **Generar el campo `info_by_phone_lg`** | [Ir a actividad](#9-generar-el-campo-info_by_phone_lg) |
-| 🔟 | **Generar el campo `info_by_dni_lg`** | [Ir a actividad](#10-generar-el-campo-info_by_dni_lg) |
-| 1️⃣1️⃣ | **Generar `repeated_phone_24H` y `cause_recall_phone_24H`** | [Ir a actividad](#11-generar-los-campos-repeated_phone_24h-y-cause_recall_phone_24h) |
-| 1️⃣2️⃣ | **Crear Tabla `ivr_summary`** | [Ir a actividad](#12-crear-tabla-ivr_summary) |
-| 1️⃣3️⃣ | **Crear función `clean_integer`** | [Ir a actividad](#13-crear-funcion-clean_integer) |
+| 3️⃣ | **Crear Tabla `ivr_detail`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad3) |
+| 4️⃣ | **Generar campo `vdn_aggregation`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad4) |
+| 5️⃣ | **Generar `document_type` y `document_identification`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad5) |
+| 6️⃣ | **Generar el campo `customer_phone`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad6) |
+| 7️⃣ | **Generar el campo `billing_account_id`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad7) |
+| 8️⃣ | **Generar el campo `masiva_lg`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad8) |
+| 9️⃣ | **Generar el campo `info_by_phone_lg`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad9) |
+| 🔟 | **Generar el campo `info_by_dni_lg`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad10) |
+| 1️⃣1️⃣ | **Generar `repeated_phone_24H` y `cause_recall_phone_24H`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad11) |
+| 1️⃣2️⃣ | **Crear Tabla `ivr_summary`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad12) |
+| 1️⃣3️⃣ | **Crear función `clean_integer`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad13) |
 
 ---
 
@@ -27,7 +98,7 @@ Descricpcion de la actividad [Practica SQL y DW](https://drive.google.com/file/d
 
 ## 1️⃣ Introducción
 
-Para diseñar el diagrama E/R, seguí un enfoque sistemático que me permitió identificar entidades y sus relaciones de manera estructurada. A continuación, describo los pasos que seguí:
+Para diseñar el diagrama E/R, seguí un enfoque sistemático que me permitió identificar entidades y sus relaciones de manera estructurada. Le hice varias actualizaciones cuando fui revisando el resto de las preguntas. A continuación, describo los pasos que seguí inicialmente hasta llegar a la version 3.0 que es la que esta en el indice:
 
 ### 🔍 **Pasos del diseño**
 1. **Identificación de actores y roles:** Determinar quiénes interactúan con el sistema (alumnos, profesores, administradores, etc.).
@@ -199,3 +270,96 @@ Table IVR_Step {
 }
 
 ```
+# **Integración del Sistema IVR en el Modelo de Datos**
+
+## **3. Creación de la Tabla `ivr_detail`**
+
+Con la solicitud de integración de un sistema IVR para la atención al cliente, fue necesario extender el modelo de datos para incluir nuevos procesos y entidades. A continuación, se detallan los cambios implementados.
+
+---
+
+### **3.1 Nuevas Entidades Agregadas**
+Se incorporaron las siguientes entidades al modelo de datos:
+
+- **`Canal_Inscripcion`**: Registra la fuente a través de la cual los alumnos se inscriben (Ejemplo: WhatsApp, Email, Llamada Telefónica).
+- **`Bootcamp_Profesor`**: Relaciona a los profesores con los bootcamps, permitiendo asignar roles específicos dentro del programa.
+- **`Profesor_Modulo`**: Relaciona profesores con los módulos que imparten, almacenando información sobre carga horaria y fecha de asignación.
+- **`IVR_Call`**: Almacena información sobre cada llamada del usuario, incluyendo su resultado, duración y segmento de cliente.
+- **`IVR_Module`**: Representa los módulos por los que pasa una llamada durante el flujo IVR.
+- **`IVR_Step`**: Registra los pasos específicos seguidos dentro de cada módulo IVR.
+- **`IVR_Detail` (Vista Consolidada)**: Integra información de `IVR_Call`, `IVR_Module` y `IVR_Step` para generar reportes detallados sobre la interacción de los clientes.
+
+---
+
+### **3.2 Definición de Nuevas Relaciones**
+Las siguientes relaciones fueron definidas para conectar los nuevos elementos con el modelo de datos existente:
+
+- **`IVR_Call` → `Inscripcion`** a través de `inscripcion_id`: Permite vincular llamadas con usuarios registrados.
+- **`IVR_Module` → `IVR_Call`** mediante `ivr_call_id`: Relaciona las llamadas con los módulos del IVR.
+- **`IVR_Step` → `IVR_Module`** a través de `ivr_module_id`: Conecta los pasos con los módulos IVR.
+- **`IVR_Call` → `Canal_Inscripcion`** mediante `canal_id`: Identifica el origen de la llamada (Ejemplo: WhatsApp, Email, Llamada Telefónica).
+
+---
+
+### **3.3 Ajustes en Datos y Cálculos**
+Se realizaron los siguientes ajustes en la estructura de datos:
+
+- Se agregaron los campos `document_type` y `document_identification` en `Alumno` para identificar al usuario en interacciones con el IVR.
+- Se incluyó `billing_account_id` en `Pago` para vincular la información de facturación con el sistema IVR.
+- Se creó un código SQL consolidado que recopila información de las llamadas IVR, incluyendo detalles del alumno, módulos y pasos dentro del sistema.
+- La consulta utiliza `LEFT JOIN` para relacionar las tablas `IVR_Call`, `IVR_Module`, `IVR_Step`, `Inscripcion`, `Alumno` y `Pago`, asegurando que cada llamada contenga información completa sobre su duración, resultado, módulos utilizados y pasos seguidos.
+- Se transforman las fechas de inicio y fin en el formato `YYYYMMDD` para facilitar su análisis.
+- La consulta también incorpora datos del alumno como tipo de documento, identificación y número de teléfono, junto con el identificador de su cuenta de facturación.
+- Se emplea `GROUP BY` para garantizar que cada combinación de llamada, módulo y paso aparezca en una sola fila, permitiendo generar reportes detallados sobre las interacciones en el IVR.
+
+🔗 **Consulta SQL**: [Ejecutar en RunSQL](https://runsql.com/r/64948899d420ab15)
+
+```sql
+SELECT
+   c.ivr_call_id,
+   c.phone_number,
+   c.ivr_result,
+   c.vdn_label,
+   c.start_date,
+   EXTRACT(YEAR FROM c.start_date) * 10000 + EXTRACT(MONTH FROM c.start_date) * 100 + EXTRACT(DAY FROM c.start_date) AS calls_start_date_id,
+   c.end_date,
+   EXTRACT(YEAR FROM c.end_date) * 10000 + EXTRACT(MONTH FROM c.end_date) * 100 + EXTRACT(DAY FROM c.end_date) AS calls_end_date_id,
+   c.total_duration,
+   c.customer_segment,
+   c.ivr_language,
+   steps_data.calls_steps_module,
+   m.module_sequence,
+   m.module_name,
+   m.module_duration,
+   m.module_result,
+   s.step_sequence,
+   s.step_name,
+   s.step_result,
+   s.step_description_error,
+   a.document_type,
+   a.document_identification,
+   a.telefono AS customer_phone,
+   p.billing_account_id 
+FROM IVR_Call c
+LEFT JOIN Inscripcion i ON c.inscripcion_id = i.inscripcion_id
+LEFT JOIN Alumno a ON i.alumno_id = a.alumno_id 
+LEFT JOIN Pago p ON i.inscripcion_id = p.inscripcion_id 
+LEFT JOIN IVR_Module m ON c.ivr_call_id = m.ivr_call_id
+LEFT JOIN IVR_Step s ON m.ivr_module_id = s.ivr_module_id
+LEFT JOIN (
+   SELECT ivr_module_id, COUNT(ivr_step_id) AS calls_steps_module
+   FROM IVR_Step
+   GROUP BY ivr_module_id
+) AS steps_data ON s.ivr_module_id = steps_data.ivr_module_id
+
+### **3.4 Impacto en los Casos de Uso**
+
+La incorporación del sistema IVR modificó algunos procesos existentes y agregó nuevos casos de uso, tales como:
+
+- 📞 **Consultar estado de inscripción vía IVR** → El alumno consulta su inscripción llamando al IVR.
+- 💳 **Consultar pagos realizados vía IVR** → El alumno ingresa su identificación y el IVR consulta su historial de pagos.
+- 🤖 **Recibir asistencia automatizada** → El alumno recibe información de soporte mediante IVR sin intervención humana.
+- 📅 **Recibir notificaciones de eventos y clases** → El IVR notifica fechas importantes a alumnos registrados.
+- 📡 **Escalar una consulta a un asesor humano** → Si el IVR no resuelve la duda, redirige la llamada a un agente.
+- 📊 **Monitoreo de calidad del IVR** → El administrador revisa reportes sobre interacciones y tiempos de resolución en IVR.
+- 🔍 **Registrar intenciones de usuarios** → El IVR almacena patrones de preguntas para mejorar la experiencia del usuario en futuras interacciones.
