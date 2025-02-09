@@ -51,7 +51,7 @@ Durante la práctica, se usaron herramientas de IA para asistir en la codificaci
 
 | #  | Actividad | Enlace |
 |----|----------|--------|
-| 1️⃣ | **Diagrama Entidad-Relación v3.0** | [Ir a actividad](https://dbdiagram.io/d/PRACTICA-SQL-Y-DW-679d9f4b263d6cf9a0b10be5) |
+| 1️⃣ | **Diagrama Entidad-Relación v3.0** | [Ver diaggrama online](https://dbdiagram.io/d/PRACTICA-SQL-Y-DW-679d9f4b263d6cf9a0b10be5) |
 | 2️⃣ | **Creación de Base de Datos** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad2) |
 | 3️⃣ | **Crear Tabla `ivr_detail`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad3) |
 | 4️⃣ | **Generar campo `vdn_aggregation`** | [Ir a actividad](https://github.com/gonzalezulises/practicaSQLKC/blob/main/Actividad4) |
